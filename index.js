@@ -11,9 +11,8 @@ var nicknameID = [];
 var gaming;
 var stopNicks;
 var players;
-var Game;
-var ShortGame;
 var voiceChat;
+var wachtrijID
 
 bot.on("ready", async () => {
     messageChannel = bot.channels.cache.get(botConfig.wachtruimtechat);
@@ -44,48 +43,53 @@ bot.on("message", async message => {
     var arguments = messageArray.slice(1);
 
     if (execute == "help") {
+        message.delete();
         message.reply('```Commands:\n.startgame [PlayerCount] [Game] : Creëer een game sessie, dit activeert de wachtrij.\n.stopgame & .endgame : Stop de game sessie, Verwijdert de wachtlijst, en leegt deze in het geheugen van de bot.\n.changeplayers: verander get totaal aantal toegestane spelers in het live kanaal. (Tijdens het moven van members. Er word geen fysiek limiet ingesteld)\n.move: vult de gameroom met de mensen die het langste wachten.```\n***LET OP!*** Om deze commands uit te kunnen voeren moet je de permissie ADMINISTRATOR hebben \nVoor bugs en/of vragen, stuur een berichtje naar TheDarkIceKing#9445')
     }
 
     if (execute == "restart") {
+        message.delete();
         if (message.member.hasPermission('ADMINISTRATOR') || message.member.id == "478260337536139264") {
-            message.reply("***De bot word opniew opgestart*** \n ***Dit kan tot 10 minuten duren!***")
+            message.channel.send("***De bot word opniew opgestart*** \n ***Dit kan tot 10 minuten duren!***").then(msg => { msg.delete({ timeout: 3000 }) })
             if (arguments[0] == "confirm") {
                 message.channel.send("Restart bevestigd, De bot word herladen")
                 setTimeout(function () { bot.destroy(); }, 1000)
             } else {
-                message.reply("Weet je zeker dat je de bot wilt herstarten?\n.restart confirm")
+                message.channel.send("Weet je zeker dat je de bot wilt herstarten?\n.restart confirm").then(msg => { msg.delete({ timeout: 3000 }) })
             }
         } else {
-            message.reply("Enkel users met de permissie ADMINISTRATOR en de developer kunnen de bot herstarten!")
+            message.channel.send("Enkel users met de permissie ADMINISTRATOR en de developer kunnen de bot herstarten!").then(msg => { msg.delete({ timeout: 3000 }) })
         }
     }
 
     if (execute == "startgame" || execute == "newgame") {
+        message.delete();
         if (!message.member.hasPermission('ADMINISTRATOR')) { return; }
         if (gaming == true) {
             message.delete()
             return;
         }
         if (!arguments[0] || !arguments[1]) {
-            message.reply(botConfig.prefix + "startgame (playercount inc. host) (game)");
+            message.channel.send(botConfig.prefix + "startgame (playercount inc. host) (game)").then(msg => { msg.delete({ timeout: 3000 }) })
             return;
         }
-        waitingPlayers.push(["Speler", "Gejoined tijd", "Game"])
+        waitingPlayers.push(["Speler", "Gejoined tijd"])
         var Temp_game = arguments.slice(1).toString()
         var Temp_game2 = Temp_game.replace(/,/g, " ")
-        ShortGame = Temp_game2.slice(0, 20)
 
         players = parseInt(arguments[0]);
         FullGame = Temp_game2;
 
         stopNicks = true;
         gaming = true;
-        message.reply(`***Waiting room opgestart. Game: ${FullGame}. Spelers: ${players}***`)
+        message.channel.send(`***Waiting room opgestart. Game: ${FullGame}. Spelers: ${players}***`).then(msg => { msg.delete({ timeout: 3000 }) })
+        createEmbed();
         getWaitingroom();
+
     }
 
     if (execute == "stopgame" || execute == "endgame") {
+        message.delete();
         if (!message.member.hasPermission('ADMINISTRATOR')) { return; }
         if (gaming == false) {
             message.delete()
@@ -99,39 +103,42 @@ bot.on("message", async message => {
                 waitingPlayers = [];
                 nicknameID = [];
             });
-        message.reply("***Game beëindigd, Wachtruimte data is verwijderd***")
+            messageChannel.messages.fetch(wachtrijID)
+            .then(msg => {
+                msg.delete()
+            });
+        message.channel.send("***Game beëindigd, Wachtruimte data is verwijderd***").then(msg => { msg.delete({ timeout: 3000 }) })
     }
     if (execute == "changeplayers") {
+        message.delete();
         if (!message.member.hasPermission('ADMINISTRATOR')) { return; }
         if (gaming == false) { return; }
         if (parseInt(arguments[0])) {
             players = parseInt(arguments[0])
-            editembed("```" + waitingTable + "```")
-            message.reply(`***Aanstal spelers veranderd naar: ${players}***`)
+            editembed()
+            message.channel.send(`***Aanstal spelers veranderd naar: ${players}***`).then(msg => { msg.delete({ timeout: 3000 }) })
         } else {
-            message.reply(`!changeplayers [spelers]`)
+            message.channel.send(`!changeplayers [spelers]`).then(msg => { msg.delete({ timeout: 3000 }) })
         }
     }
     if (execute == "changegame") {
+        message.delete();
         if (!message.member.hasPermission('ADMINISTRATOR')) { return; }
         if (gaming == false) { return; }
         if (arguments[0]) {
             FullGame = arguments.toString().replace(/,/g, " ")
-            console.log(FullGame)
-            ShortGame = FullGame.slice(0, 20)
-            console.log(ShortGame)
-            editembed("```" + waitingTable + "```")
-            message.reply(message.reply(`***Game veranderd naar: ${FullGame}***`))
+            editembed()
+            message.channel.send(`***Game veranderd naar: ${FullGame}***`).then(msg => { msg.delete({ timeout: 3000 }) })
             return;
         } else {
-            console.log("hi")
-            message.reply("!changegame [naam]")
+            message.channel.send("!changegame [naam]").then(msg => { msg.delete({ timeout: 3000 }) })
         }
     }
     if (execute == "move") {
+        message.delete();
         if (!message.member.hasPermission('ADMINISTRATOR')) { return; }
         if (gaming == false) { return; }
-        message.reply("***Moving players***")
+        message.channel.send("***Moving players***").then(msg => { msg.delete({ timeout: 3000 }) })
         var amountMoves = players - voiceChat.members.size;
 
         for (i = 0; i < amountMoves; i++) {
@@ -161,7 +168,7 @@ bot.on('voiceStateUpdate', async (oldMember, newMember) => {
         listName = TemplistName.slice(0, 17)
     }
     if (newUserChannel == botConfig.wachtruimte) {
-        waitingPlayers.push([listName, await getTime(), ShortGame])
+        waitingPlayers.push([listName, await getTime()])
         nicknameID.push([newMember.member.user.id, listName])
 
     } else if (newUserChannel != botConfig.wachtruimte) {
@@ -180,7 +187,8 @@ bot.on('voiceStateUpdate', async (oldMember, newMember) => {
         }
     }
     waitingTable = table(waitingPlayers);
-    editembed("```" + waitingTable + "```")
+    editembed()
+    editWaitingRoom();
 });
 async function getWaitingroom() {
     var listName;
@@ -199,12 +207,11 @@ async function getWaitingroom() {
         else {
             listName = TemplistName.slice(0, 17)
         }
-        waitingPlayers.push([listName, time, ShortGame])
+        waitingPlayers.push([listName, time])
         nicknameID.push([player.id, listName])
     });
 
-    waitingTable = table(waitingPlayers);
-    createEmbed("```" + waitingTable + "```")
+    createWaitingRoom();
 
 }
 
@@ -214,25 +221,25 @@ async function getTime() {
     return time
 }
 
-async function buildembed(string) {
+async function buildembed() {
 
     var WaitEmbed = new discord.MessageEmbed()
         .setTitle("***Wachtruimte***")
         .setColor("7DE5E3")
-        // .setThumbnail('https://cdn.discordapp.com/icons/629572447644942376/a_0589a38a4c4b8198398ea97c9a6f7cf8.gif?size=128')
+        .setThumbnail('https://cdn.discordapp.com/icons/629572447644942376/a_0589a38a4c4b8198398ea97c9a6f7cf8.gif?size=128')
         .addField("***Huidige game***", "*" + FullGame + "*")
         .addField("Max players:", players)
         .addField("Mensen in de wachtrij:", waitingPlayers.length - 1)
-        .addField("\u200b", string)
+        // .addField("\u200b", string)
         .setFooter("Developed door: TheDarkIceKing#9445")
         .setTimestamp()
 
     return WaitEmbed;
 }
 
-async function createEmbed(string) {
+async function createEmbed() {
 
-    var WaitEmbed = await buildembed(string)
+    var WaitEmbed = await buildembed()
 
     messageChannel.send(WaitEmbed).then(
         message => {
@@ -241,14 +248,38 @@ async function createEmbed(string) {
     )
 }
 
-async function editembed(string) {
+async function editembed() {
 
-    var WaitEmbed = await buildembed(string)
+    var WaitEmbed = await buildembed()
 
     messageChannel.messages.fetch(waitingID)
         .then(msg => {
             msg.edit(WaitEmbed)
         });
+}
+
+async function createWaitingRoom(
+) {
+    waitingTable = table(waitingPlayers);
+    messageChannel.send("```" + waitingTable + "```").then(msg => {
+        wachtrijID = msg.id
+    })
+}
+
+async function editWaitingRoom() {
+    waitingTable = table(waitingPlayers);
+    console.log(waitingTable.length)
+
+    if (waitingTable.length < 2000) {
+        messageChannel.messages.fetch(wachtrijID)
+            .then(msg => {
+                msg.edit("```" + waitingTable + "```")
+            });
+    } else {
+        console.log(nicknameID[nicknameID.length - 1][0])
+        messageChannel.send(`<@${nicknameID[nicknameID.length - 1][0]}> Door discord limitaties kunnen we je niet toevoegen aan de lijst. Don't worry, je staat gewoon in de wachtrij, Je word in de lijst gezet zodra er plaats is`).then(msg => { msg.delete({ timeout: 10000 }) })
+    }
+
 }
 
 bot.login(process.env.TOKEN);
