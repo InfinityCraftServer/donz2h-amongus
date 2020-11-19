@@ -25,7 +25,6 @@ bot.on("ready", async () => {
     game = "Geen";
     stopNicks = false;
     waitingPlayers = [];
-    waitingPlayers.push(["Speler", "Gejoined tijd", "Game"])
 })
 bot.on("message", async message => {
 
@@ -58,6 +57,7 @@ bot.on("message", async message => {
             message.reply(botConfig.prefix + "startgame (playercount inc. host) (game)");
             return;
         }
+        waitingPlayers.push(["Speler", "Gejoined tijd", "Game"])
         var Temp_game = arguments.slice(1).toString()
         var Temp_game2 = Temp_game.replace(/,/g, " ")
         ShortGame = Temp_game2.slice(0, 20)
