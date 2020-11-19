@@ -44,14 +44,19 @@ bot.on("message", async message => {
     var arguments = messageArray.slice(1);
 
     if (execute == "help") {
-        message.reply('```Commands:\n!startgame [PlayerCount] [Game] : Creëer een game sessie, dit activeert de wachtrij.\n!stopgame & !endgame : Stop de game sessie, Verwijdert de wachtlijst, en leegt deze in het geheugen van de bot.\n!changeplayers: verander get totaal aantal toegestane spelers in het live kanaal. (Tijdens het moven van members. Er word geen fysiek limiet ingesteld)\n!move: vult de gameroom met de mensen die het langste wachten.```\n***LET OP!*** Om deze commands uit te kunnen voeren moet je de permissie ADMINISTRATOR hebben \nVoor bugs en/of vragen, stuur een berichtje naar TheDarkIceKing#9445')
+        message.reply('```Commands:\n.startgame [PlayerCount] [Game] : Creëer een game sessie, dit activeert de wachtrij.\n.stopgame & .endgame : Stop de game sessie, Verwijdert de wachtlijst, en leegt deze in het geheugen van de bot.\n.changeplayers: verander get totaal aantal toegestane spelers in het live kanaal. (Tijdens het moven van members. Er word geen fysiek limiet ingesteld)\n.move: vult de gameroom met de mensen die het langste wachten.```\n***LET OP!*** Om deze commands uit te kunnen voeren moet je de permissie ADMINISTRATOR hebben \nVoor bugs en/of vragen, stuur een berichtje naar TheDarkIceKing#9445')
     }
 
     if (execute == "restart") {
         if (message.member.hasPermission('ADMINISTRATOR') || message.member.id == "478260337536139264") {
-            message.reply("***De bot word opniew opgestart***")
-            setTimeout(function() {bot.destroy();}, 1000)
-        } else{
+            message.reply("***De bot word opniew opgestart*** \n ***Dit kan tot 10 minuten duren!***")
+            if (arguments[0].toLowerCase("confirm")) {
+                message.channel.send("Restart bevestigd, De bot word herladen")
+                setTimeout(function () { bot.destroy(); }, 1000)
+            } else{
+                message.reply("Weet je zeker dat je de bot wilt herstarten?\n.restart confirm")
+            }
+        } else {
             message.reply("Enkel users met de permissie ADMINISTRATOR en de developer kunnen de bot herstarten!")
         }
     }
