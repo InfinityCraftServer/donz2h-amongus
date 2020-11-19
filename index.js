@@ -43,8 +43,17 @@ bot.on("message", async message => {
 
     var arguments = messageArray.slice(1);
 
-    if(execute == "help"){
+    if (execute == "help") {
         message.reply('```Commands:\n!startgame [PlayerCount] [Game] : Creëer een game sessie, dit activeert de wachtrij.\n!stopgame & !endgame : Stop de game sessie, Verwijdert de wachtlijst, en leegt deze in het geheugen van de bot.\n!changeplayers: verander get totaal aantal toegestane spelers in het live kanaal. (Tijdens het moven van members. Er word geen fysiek limiet ingesteld)\n!move: vult de gameroom met de mensen die het langste wachten.```\n***LET OP!*** Om deze commands uit te kunnen voeren moet je de permissie ADMINISTRATOR hebben \nVoor bugs en/of vragen, stuur een berichtje naar TheDarkIceKing#9445')
+    }
+
+    if (execute == "forcedrestart") {
+        if (message.member.hasPermission('ADMINISTRATOR') || message.member.id == "478260337536139264") {
+            message.reply("***De bot word opniew opgestart***")
+            process.exit(1);
+        } else{
+            message.reply("Enkel users met de permissie ADMINISTRATOR en de developer kunnen de bot herstarten!")
+        }
     }
 
     if (execute == "startgame") {
@@ -94,7 +103,7 @@ bot.on("message", async message => {
             players = parseInt(arguments[0])
             editembed("```" + waitingTable + "```")
             message.reply(`***Aanstal spelers veranderd naar: ${players}***`)
-        } else{
+        } else {
             message.reply(`!changeplayers [spelers]`)
         }
     }
@@ -134,8 +143,8 @@ bot.on("message", async message => {
 })
 
 bot.on('voiceStateUpdate', async (oldMember, newMember) => {
-    if(oldMember.mute != newMember.mute){return;}
-    if(oldMember.deaf != newMember.deaf){return;}
+    if (oldMember.mute != newMember.mute) { return; }
+    if (oldMember.deaf != newMember.deaf) { return; }
     if (gaming == false) { return; }
     let newUserChannel = newMember.channelID
     var TemplistName = newMember.member.nickname;
