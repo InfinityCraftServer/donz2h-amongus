@@ -53,7 +53,7 @@ bot.on("message", async message => {
             if (arguments[0] == "confirm") {
                 message.channel.send("Restart bevestigd, De bot word herladen")
                 setTimeout(function () { bot.destroy(); }, 1000)
-            } else{
+            } else {
                 message.reply("Weet je zeker dat je de bot wilt herstarten?\n.restart confirm")
             }
         } else {
