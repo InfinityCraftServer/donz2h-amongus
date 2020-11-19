@@ -50,7 +50,7 @@ bot.on("message", async message => {
     if (execute == "restart") {
         if (message.member.hasPermission('ADMINISTRATOR') || message.member.id == "478260337536139264") {
             message.reply("***De bot word opniew opgestart***")
-            process.exit(1);
+            setTimeout(function() {bot.destroy();}, 1000)
         } else{
             message.reply("Enkel users met de permissie ADMINISTRATOR en de developer kunnen de bot herstarten!")
         }
