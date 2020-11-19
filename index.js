@@ -61,7 +61,7 @@ bot.on("message", async message => {
         }
     }
 
-    if (execute == "startgame") {
+    if (execute == "startgame" || execute == "newgame") {
         if (!message.member.hasPermission('ADMINISTRATOR')) { return; }
         if (gaming == true) {
             message.delete()
